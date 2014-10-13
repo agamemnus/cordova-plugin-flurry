@@ -89,7 +89,7 @@ flurryExport.destroyBannerView = function (options, success, error) {
 // success : The function to call if an ad was requested successfully.
 // error   : The function to call if an ad failed to be requested.
 flurryExport.showAd = function (show, success, error) {
- cordova.exec (success, error, 'Flurry', 'showAd', [if (typeof show != "undefined") ? show : true])
+ cordova.exec (success, error, 'Flurry', 'showAd', [(typeof show != "undefined") ? show : true])
 }
 
 module.exports = flurryExport
