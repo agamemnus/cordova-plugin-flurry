@@ -25,13 +25,13 @@ Note: ensure you have a proper Flurry account and create an Id for your app.
     
 ## Quick example with cordova command line tool ##
 ------------------------------------------------
-    cordova create testflurry com.rjfun.testflurry TestFlurry
+    cordova create testflurry com.agamemnus.testflurry TestFlurry
     cd testflurry
     cordova platform add android
     cordova platform add ios
     cordova plugin add https://github.com/floatinghotpot/cordova-plugin-flurry.git
     rm -r www/*
-    cp plugins/com.rjfun.cordova.plugin.flurry/test/index.html www/
+    cp plugins/com.agamemnus.cordova.plugin.flurry/test/index.html www/
     cordova prepare; cordova run android; cordova run ios; 
     ... cordova emulate android/ios, or import the android project into eclipse or ios project into xcode
 
@@ -132,4 +132,3 @@ Cordova/PhoneGap plugins for the world leading Mobile Ad services:
 More Cordova/PhoneGap plugins by Raymond Xie, [click here](http://floatinghotpot.github.io/).
 
 Project outsourcing and consulting service is also available. Please [contact us](http://floatinghotpot.github.io) if you have the business needs.
-
