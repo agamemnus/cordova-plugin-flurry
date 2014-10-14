@@ -18,6 +18,7 @@ flurryExport.createBannerView = function (options, success, error) {
  if (flurryExport.bannerLoaded) {
   requestBannerAd (options, success, error)
  } else {
+  flurryExport.bannerLoaded = true
   var defaults = {'adId': undefined, 'adSize': undefined, 'bannerAtTop': false}
   var requiredOptions = ['adId', 'adSize']
   // Merge optional settings into defaults.
