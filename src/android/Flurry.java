@@ -53,12 +53,12 @@ public class Flurry extends CordovaPlugin implements FlurryAdListener {
  private static final String ACTION_REQUEST_INTERSTITIAL_AD  = "requestInterstitialAd";
  private static final String ACTION_SHOW_AD                  = "showAd";
  
- private static final int PUBLISHER_ID_ARG_INDEX    = 0;
- private static final int AD_SIZE_ARG_INDEX         = 1;
- private static final int POSITION_AT_TOP_ARG_INDEX = 2;
- private static final int IS_TESTING_ARG_INDEX      = 0;
- private static final int EXTRAS_ARG_INDEX          = 1;
- private static final int SHOW_AD_ARG_INDEX         = 0;
+ private static final int	PUBLISHER_ID_ARG_INDEX    = 0;
+ private static final int	AD_SIZE_ARG_INDEX         = 1;
+ private static final int	POSITION_AT_TOP_ARG_INDEX = 2;
+ private static final int	IS_TESTING_ARG_INDEX      = 0;
+ private static final int	EXTRAS_ARG_INDEX          = 1;
+ private static final int	SHOW_AD_ARG_INDEX         = 0;
  
  // This is the main method for the Flurry plugin. All API calls go through here.
  // This method determines the action, and executes the appropriate call.
@@ -70,20 +70,20 @@ public class Flurry extends CordovaPlugin implements FlurryAdListener {
  @Override public boolean execute (String action, JSONArray inputs, CallbackContext callbackContext) throws JSONException {
   PluginResult result = null;
   if (ACTION_CREATE_BANNER_VIEW.equals(action)) {
-   result = executeCreateBannerView(inputs, callbackContext);
+   result = executeCreateBannerView (inputs, callbackContext);
   } else if (ACTION_DESTROY_BANNER_VIEW.equals(action)) {
-   result = executeDestroyBannerView(callbackContext);
+   result = executeDestroyBannerView (callbackContext);
   } else if (ACTION_REQUEST_AD.equals(action)) {
-   result = executeRequestAd(inputs, callbackContext);
+   result = executeRequestAd (inputs, callbackContext);
   } else if (ACTION_SHOW_AD.equals(action)) {
-   result = executeShowAd(inputs, callbackContext);
+   result = executeShowAd (callbackContext);
   } else if (ACTION_CREATE_INTERSTITIAL_VIEW.equals(action)) {
-    result = executeCreateInterstitialView(inputs, callbackContext);
+    result = executeCreateInterstitialView (inputs, callbackContext);
   } else if (ACTION_REQUEST_INTERSTITIAL_AD.equals(action)) {
-   result = executeRequestInterstitialAd(inputs, callbackContext);
+   result = executeRequestInterstitialAd (inputs, callbackContext);
   } else {
-   Log.d (LOGTAG, String.format("Invalid action passed: %s", action));
-   result = new PluginResult(Status.INVALID_ACTION);
+   Log.d (LOGTAG, String.format ("Invalid action passed: %s", action));
+   result = new PluginResult (Status.INVALID_ACTION);
   }
   if (result != null) callbackContext.sendPluginResult(result);
   return true;
@@ -97,7 +97,7 @@ public class Flurry extends CordovaPlugin implements FlurryAdListener {
  // the first object in the array to be a JSONObject with the input parameters.
  // Returns PluginResult representing whether or not the banner was created successfully.
  private PluginResult executeCreateBannerView (JSONArray inputs, CallbackContext callbackContext) {
-  Log.w (LOGTAG, "executeCreateBannerView");
+ 	Log.w (LOGTAG, "executeCreateBannerView");
   String publisherId;
   // Get the input data.
   try {
@@ -105,85 +105,85 @@ public class Flurry extends CordovaPlugin implements FlurryAdListener {
    this.bannerAtTop = inputs.getBoolean (POSITION_AT_TOP_ARG_INDEX);
    this.adSize = adSizeFromString (inputs.getString(AD_SIZE_ARG_INDEX));
   } catch (JSONException exception) {
-   Log.w(LOGTAG, String.format("Got JSON Exception: %s", exception.getMessage()));
+   Log.w (LOGTAG, String.format ("Got JSON Exception: %s", exception.getMessage()));
    return new PluginResult (Status.JSON_EXCEPTION);
   }
   
   boolean firstTimeInit = false;
   if (!inited) { 
-   firstTimeInit = true;
+	  firstTimeInit = true;
    FlurryAds.setAdListener (this);
-   Log.w (LOGTAG, "onStartSession");
-   FlurryAgent.onStartSession(cordova.getActivity(), publisherId);
-   inited = true;
+  	Log.w (LOGTAG, "onStartSession");
+	  FlurryAgent.onStartSession (cordova.getActivity(), publisherId);
+	  inited = true;
   } else {
-   Log.w (LOGTAG, "already inited, no need init again.");
+  	Log.w (LOGTAG, "Already initiated: no need initiate again.");
   }
   
   if (adView == null) {
-   Log.w (LOGTAG, "new FrameLayout");
+  	Log.w (LOGTAG, "new FrameLayout");
    adView = new FrameLayout(cordova.getActivity());
-   FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
-   LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-   params.gravity = bannerAtTop ? Gravity.TOP : Gravity.BOTTOM;
-   adView.setLayoutParams(params);
+  	FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+ 		LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+  	params.gravity = bannerAtTop ? Gravity.TOP : Gravity.BOTTOM;
+  	adView.setLayoutParams(params);
   }
   
-  switch(this.adSize) {
-   case BANNER_TOP    : adSpace = adTopBanner; break;
-   case BANNER_BOTTOM : adSpace = adBottomBanner; break;
-   case FULLSCREEN    : adSpace = adFull; break;
-  }
+	 switch(this.adSize) {
+	  case BANNER_TOP    : adSpace = adTopBanner; break;
+	  case BANNER_BOTTOM : adSpace = adBottomBanner; break;
+	  case FULLSCREEN    : adSpace = adFull; break;
+ 	}
   
   // Create the AdView on the UI thread.
-  cordova.getActivity().runOnUiThread (new Runnable() {
-   @Override public void run() {
-    if (adView.getParent() != null) ((ViewGroup)adView.getParent()).removeView(adView);
-    ViewGroup parentView = (ViewGroup) webView.getParent();
-    if (bannerAtTop) {parentView.addView(adView, 0);} else {parentView.addView(adView);}
-   }
-  });
-  
-  if (!firstTimeInit) {
+ 	cordova.getActivity().runOnUiThread (new Runnable() {
+	  @Override public void run() {
+			 if (adView.getParent() != null) ((ViewGroup)adView.getParent()).removeView(adView);
+			 ViewGroup parentView = (ViewGroup) webView.getParent();
+			 if (bannerAtTop) {parentView.addView(adView, 0);} else {parentView.addView(adView);}
+	  }
+	 });
+ 	
+ 	if (!firstTimeInit) {
    callbackContext.success ();
   } else {
   // Delay 3 seconds before callback.
-   final CallbackContext delayCallback = callbackContext;
-    cordova.getThreadPool().execute (new Runnable(){
-     @Override public void run () {
-      try {Thread.sleep(3000);} catch (InterruptedException e) {e.printStackTrace();}
-      delayCallback.success();
-     }
-    });
-  }
+ 		final CallbackContext delayCallback = callbackContext;
+ 	 	cordova.getThreadPool().execute (new Runnable(){
+ 		  @Override public void run () {
+ 				 try {Thread.sleep(3000);} catch (InterruptedException e) {e.printStackTrace();}
+ 				 delayCallback.success();
+ 		  }
+ 	 	});
+ 	}
   return null;
  }
  
  private PluginResult executeDestroyBannerView (CallbackContext callbackContext) {
-  Log.w (LOGTAG, "executeDestroyBannerView");
-  final CallbackContext delayCallback = callbackContext;
-  cordova.getActivity().runOnUiThread (new Runnable() {
-   @Override public void run() {
-    if (adView != null) {
-     FlurryAds.removeAd(cordova.getActivity(), adSpace, adView);
-     ViewGroup parentView = (ViewGroup)adView.getParent();
-     if (parentView != null) parentView.removeView(adView);
-     adView = null;
-    }
-    delayCallback.success();
-   }
-  });
-  return null;
+ 	Log.w (LOGTAG, "executeDestroyBannerView");
+	 final CallbackContext delayCallback = callbackContext;
+ 	cordova.getActivity().runOnUiThread (new Runnable() {
+	  @Override public void run() {
+			 if (adView != null) {
+ 				FlurryAds.removeAd (cordova.getActivity(), adSpace, adView);
+				 ViewGroup parentView = (ViewGroup)adView.getParent();
+				 if (parentView != null) parentView.removeView(adView);
+				 adView = null;
+			 }
+			 delayCallback.success();
+	  }
+ 	});
+ 	return null;
  }
  
  // Parses the request ad input parameters and runs the request ad action on the UI thread.
- // inputs: The JSONArray representing input parameters. This function expects the first
- // object in the array to be a JSONObject with the input parameters.
- // Returns a PluginResult representing whether or not an ad was requested succcessfully.
- // Listen for onReceiveAd() and onFailedToReceiveAd() callbacks to see if an ad was successfully retrieved. 
+ // inputs: The JSONArray representing input parameters. This function expects the first object
+ // in the array to be a JSONObject with the input parameters.
+ // Returns a PluginResult representing whether or not an ad was requested successfully.
+ // Listen for onReceiveAd() and onFailedToReceiveAd() callbacks to see if an ad was successfully retrieved.
  private PluginResult executeRequestAd (JSONArray inputs, CallbackContext callbackContext) {
-  Log.w (LOGTAG, "executeRequestAd");
-  if (adView == null) return new PluginResult( Status.ERROR, "adView is null: call createBannerView/createInterstitialView first.");
+ 	Log.w (LOGTAG, "executeRequestAd");
+  if (adView == null)	return new PluginResult( Status.ERROR, "adView is null: call createBannerView/createInterstitialView first.");
   
   final boolean isTesting;
   JSONObject inputExtras;
@@ -197,80 +197,48 @@ public class Flurry extends CordovaPlugin implements FlurryAdListener {
    return new PluginResult(Status.JSON_EXCEPTION);
   }
   
-  final CallbackContext delayCallback = callbackContext;
+	 final CallbackContext delayCallback = callbackContext;
   
-  cordova.getThreadPool().execute (new Runnable(){
-   @Override public void run () {
-    FlurryAds.enableTestAds (isTesting);
-    Log.w(LOGTAG, String.format("fetchAd for %s, %d", adSpace, intValueOf(adSize)));
-    FlurryAds.fetchAd(cordova.getActivity(), adSpace, adView, adSize);
-    try {Thread.sleep(3000);} catch (InterruptedException e) {e.printStackTrace();}
-    delayCallback.success ();
-   }
-  });
-  return null;
+ 	cordova.getThreadPool().execute (new Runnable(){
+	  @Override public void run () {
+			 FlurryAds.enableTestAds (isTesting);
+			 Log.w(LOGTAG, String.format("fetchAd for %s, %d", adSpace, intValueOf(adSize)));
+		 	FlurryAds.fetchAd(cordova.getActivity(), adSpace, adView, adSize);
+			 try {Thread.sleep(3000);} catch (InterruptedException e) {e.printStackTrace();}
+		 	delayCallback.success ();
+	  }
+ 	});
+ 	return null;
  }
  
  // Parses the show ad input parameters and runs the show ad action on the UI thread.
- // inputs : The JSONArray representing input parameters. This function
- // expects the first object in the array to be a JSONObject with the input parameters.
- // Returns a PluginResult representing whether or not an ad was requested
- // succcessfully. Listen for onReceiveAd() and onFailedToReceiveAd()
- // callbacks to see if an ad was successfully retrieved. 
- private PluginResult executeShowAd(JSONArray inputs, CallbackContext callbackContext) {
-  Log.w (LOGTAG, "executeShowAd");
-  if (adView == null) return new PluginResult( Status.ERROR, "adView is null, call createBannerView/createInterstitialView first.");
-  // Get the input data.
-  try {
-   this.adShow = inputs.getBoolean( SHOW_AD_ARG_INDEX );
-  } catch (JSONException exception) {
-   Log.w(LOGTAG, String.format("Got JSON Exception: %s", exception.getMessage()));
-   return new PluginResult(Status.JSON_EXCEPTION);
-  }
-  if ((adShow) && (!FlurryAds.isAdReady(adSpace))) {
-   Log.w (LOGTAG, String.format("fetchAd for %s, %d", adSpace, intValueOf(adSize)));
-   cordova.getThreadPool().execute (new Runnable() {
-   @Override public void run () {FlurryAds.fetchAd(cordova.getActivity(), adSpace, adView, adSize);}
-  });
- }
- 
- // Creates the AdView on the UI thread.
- final CallbackContext delayCallback = callbackContext;
-  cordova.getActivity().runOnUiThread (new Runnable() {
-   @Override public void run() {
-   if (adShow) {
-    adView.setVisibility(View.VISIBLE);
-   } else {
-    Log.w (LOGTAG, "Hiding ad now.");
-    adView.setVisibility(View.GONE);
-   }
-   delayCallback.success();
-   }
-  });
+ // inputs : The JSONArray representing input parameters. This function expects the
+ // first object in the array to be a JSONObject with the input parameters.
+ // Returns a PluginResult representing whether or not an ad was requested successfully.
+ // Listen for onReceiveAd() and onFailedToReceiveAd() callbacks to see if an ad was successfully retrieved. 
+ private PluginResult executeShowAd (CallbackContext callbackContext) {
+ 	Log.w (LOGTAG, "executeShowAd");
+  if (adView == null) return new PluginResult (Status.ERROR, "adView is null: call createBannerView/createInterstitialView first.");
+  // Displays the currently loaded ad.
+  FlurryAds.displayAd (cordova.getActivity(), adSpace, adView);
   return null;
- }
- 
- // Displays the currently loaded ad.
- private PluginResult displayAd () {
-  FlurryAds.displayAd(cordova.getActivity(), adSpace, adView);
  }
  
  // Parses the create interstitial view input parameters and runs the create interstitial
  // view action on the UI thread. If this request is successful, the developer
- // should make the requestAd call to request an ad for the banner.
- // inputs: The JSONArray representing input parameters. This function
- // expects the first object in the array to be a JSONObject with the
- // input parameters.
- // Returns a PluginResult representing whether or not the banner was created successfully.
+ // should make the requestAd call to request an ad for the interstitial.
+ // inputs: The JSONArray representing input parameters. This function expects
+ // the first object in the array to be a JSONObject with the input parameters.
+ // Returns a PluginResult representing whether or not the interstitial was created successfully.
  private PluginResult executeCreateInterstitialView (JSONArray inputs, CallbackContext callbackContext) {
-  Log.w (LOGTAG, "executeCreateInterstitialView");
+ 	Log.w (LOGTAG, "executeCreateInterstitialView");
   try {
-   inputs.put(POSITION_AT_TOP_ARG_INDEX, true);
-   inputs.put(AD_SIZE_ARG_INDEX, "FULLSCREEN");
-  } catch (JSONException e) {
-   e.printStackTrace();
-  }
-  return executeCreateBannerView(inputs, callbackContext);
+	 	inputs.put(POSITION_AT_TOP_ARG_INDEX, true);
+	 	inputs.put(AD_SIZE_ARG_INDEX, "FULLSCREEN");
+	 } catch (JSONException e) {
+	 	e.printStackTrace();
+	 }
+  return executeCreateBannerView (inputs, callbackContext);
  }
 
  // Parses the request interstitial ad input parameters and runs the request ad action on the UI thread.
@@ -279,8 +247,8 @@ public class Flurry extends CordovaPlugin implements FlurryAdListener {
  // Returns a PluginResult representing whether or not an ad was requested succcessfully.
  // Listen for onReceiveAd() and onFailedToReceiveAd() callbacks to see if an ad was successfully retrieved. 
  private PluginResult executeRequestInterstitialAd (JSONArray inputs, CallbackContext callbackContext) {
-  Log.w (LOGTAG, "executeRequestInterstitialAd");
-  return executeRequestAd (inputs, callbackContext);
+ 	Log.w (LOGTAG, "executeRequestInterstitialAd");
+ 	return executeRequestAd (inputs, callbackContext);
  }
  
  // This class implements the Flurry ad listener events. It forwards the events
@@ -292,39 +260,38 @@ public class Flurry extends CordovaPlugin implements FlurryAdListener {
  // document.addEventListener('onDismissAd', function());
  // document.addEventListener('onLeaveToAd', function());
  
- public class BasicListener implements FlurryAdListener {
- @Override public void onAdClicked(String arg0) {Log.w("Flurry", "onAdClicked");}
- @Override public void onAdClosed(String arg0) {
-  Log.w ("Flurry", "onAdClosed");
-  webView.post (new Runnable() {@Override public void run() {webView.loadUrl("javascript:cordova.fireDocumentEvent('onDismissAd');");}});
- }
- @Override public void onAdOpened (String arg0) {
-  Log.w ("Flurry", "onAdOpened");
-  webView.post(new Runnable() {
-   @Override public void run() {webView.loadUrl("javascript:cordova.fireDocumentEvent('onPresentAd');");}
-  });
- }
- @Override public void onApplicationExit(String arg0) {Log.w("Flurry", "onApplicationExit");}
- @Override public void onRenderFailed (String arg0) {Log.w ("Flurry", "onRenderFailed");}
- @Override public void onRendered (String arg0) {Log.w("Flurry", "onRendered");}
- @Override public void onVideoCompleted (String arg0) {Log.w ("Flurry", "onVideoCompleted");}
- @Override public boolean shouldDisplayAd (String arg0, FlurryAdType arg1) {Log.w ("Flurry", "shouldDisplayAd"); return this.adShow;}
- @Override public void spaceDidFailToReceiveAd (String errorCode) {
-  Log.w ("Flurry", String.format("spaceDidFailToReceiveAd: %s", errorCode));
-  final String fErrorCode = errorCode;
-  webView.post(new Runnable() {
-   @Override public void run() {webView.loadUrl(String.format("javascript:cordova.fireDocumentEvent('onFailedToReceiveAd', { 'error': '%s' });", fErrorCode));}
-  });
- }
- @Override public void spaceDidReceiveAd (String arg0) {
-  Log.w ("Flurry", String.format("spaceDidReceiveAd, for %s, now show it", arg0));
-  webView.post (new Runnable() {
-   @Override public void run () {webView.loadUrl("javascript:cordova.fireDocumentEvent('onReceiveAd');");}
-  });
- }
+	@Override public void onAdClicked (String arg0) {Log.w("Flurry", "onAdClicked");}
+	@Override public void onAdClosed (String arg0) {
+	 Log.w ("Flurry", "onAdClosed");
+	 webView.post (new Runnable() {@Override public void run() {webView.loadUrl("javascript:cordova.fireDocumentEvent('onDismissAd');");}});
+	}
+	@Override public void onAdOpened (String arg0) {
+	 Log.w ("Flurry", "onAdOpened");
+	 webView.post(new Runnable() {
+		 @Override public void run() {webView.loadUrl("javascript:cordova.fireDocumentEvent('onPresentAd');");}
+		});
+	}
+	@Override public void onApplicationExit(String arg0) {Log.w("Flurry", "onApplicationExit");}
+	@Override public void onRenderFailed (String arg0) {Log.w ("Flurry", "onRenderFailed");}
+	@Override public void onRendered (String arg0) {Log.w("Flurry", "onRendered");}
+	@Override public void onVideoCompleted (String arg0) {Log.w ("Flurry", "onVideoCompleted");}
+	@Override public boolean shouldDisplayAd (String arg0, FlurryAdType arg1) {Log.w ("Flurry", "shouldDisplayAd"); return this.adShow;}
+	@Override	public void spaceDidFailToReceiveAd (String errorCode) {
+	 Log.w ("Flurry", String.format("spaceDidFailToReceiveAd: %s", errorCode));
+		final String fErrorCode = errorCode;
+	 webView.post(new Runnable() {
+		 @Override public void run() {webView.loadUrl(String.format("javascript:cordova.fireDocumentEvent('onFailedToReceiveAd', { 'error': '%s' });", fErrorCode));}
+		});
+	}
+	@Override public void spaceDidReceiveAd (String arg0) {
+	 Log.w ("Flurry", String.format("spaceDidReceiveAd, for %s, now show it", arg0));
+	 webView.post (new Runnable() {
+		 @Override public void run () {webView.loadUrl("javascript:cordova.fireDocumentEvent('onReceiveAd');");}
+		});
+	}
  
  @Override public void onPause (boolean multitasking) {
-  adShow = false;
+	 adShow = false;
   super.onPause (multitasking);
  }
 
@@ -333,37 +300,37 @@ public class Flurry extends CordovaPlugin implements FlurryAdListener {
   adShow = true;
  }
  
- @Override public void onDestroy () {
-  if (adView != null) {
-   FlurryAds.removeAd (cordova.getActivity(), adSpace, adView);
-   ViewGroup parentView = (ViewGroup) adView.getParent();
-   if (parentView != null) parentView.removeView (adView);
-   adView = null;
-  }
-  super.onDestroy();
- }
+	@Override public void onDestroy () {
+		if (adView != null) {
+			FlurryAds.removeAd (cordova.getActivity(), adSpace, adView);
+			ViewGroup parentView = (ViewGroup) adView.getParent();
+			if (parentView != null) parentView.removeView (adView);
+			adView = null;
+		}
+		super.onDestroy();
+	}
  
  // Gets an FlurryAdSize object from the string size passed in from JavaScript.
  // size: The string size representing an ad format constant.
  // Returns a FlurryAdSize object used to create a banner. If the provided string isn't matched, returns null, instead.
  public FlurryAdSize adSizeFromString (String size) {
   if ("FULLSCREEN".equals(size)) {
-   return FlurryAdSize.FULLSCREEN;
+  	return FlurryAdSize.FULLSCREEN;
   } else if ("BANNER_TOP".equals(size)) {
-   return FlurryAdSize.BANNER_TOP;
+  	return FlurryAdSize.BANNER_TOP;
   } else if ("BANNER_BOTTOM".equals(size)) {
-   return FlurryAdSize.BANNER_BOTTOM;
+  	return FlurryAdSize.BANNER_BOTTOM;
   } else {
-   return bannerAtTop ? FlurryAdSize.BANNER_TOP : FlurryAdSize.BANNER_BOTTOM;
+  	return bannerAtTop ? FlurryAdSize.BANNER_TOP : FlurryAdSize.BANNER_BOTTOM;
   }
  }
  
  public int intValueOf (FlurryAdSize sz) {
-  switch (sz) {
-  case BANNER_TOP    : return 1;
-  case BANNER_BOTTOM : return 2;
-  case FULLSCREEN    : return 3;
-  default: return 0;
-  }
+	 switch (sz) {
+	 case BANNER_TOP    : return 1;
+	 case BANNER_BOTTOM : return 2;
+	 case FULLSCREEN    : return 3;
+	 default: return 0;
+	 }
  }
 }
