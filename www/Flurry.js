@@ -82,8 +82,6 @@ flurryExport.createInterstitialView = function (options, success, error) {
  // success : The function to call if an ad was requested successfully.
  // error   : The function to call if an ad failed to be requested.
  function requestInterstitialAd (options, success, error) {
-  console.dir (options)
-  flurryExport.showAd (options, success, error)
   var defaults = {'isTesting': true, 'extras': {}}
   for (var key in defaults) {if (typeof options[key] != "undefined") defaults[key] = options[key]}
   console.dir (defaults)
