@@ -2,12 +2,12 @@
 
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
 	xmlns:android="http://schemas.android.com/apk/res/android"
-	id="com.rjfun.cordova.plugin.flurry"
+	id="com.agamemnus.cordova.plugin.flurry"
 	version="1.0.0">
       
     <name>FlurryAd</name>
 	<description>Add Flurry Ads to cordova app, earn more revenue with Flurry for publishers</description>
-	<author>Raymond Xie Liming</author>
+	<author>Raymond Xie Liming, modifications by Michael Romanovsky</author>
 	<license>MIT</license>
     <keywords>ad,ads,flurry,admob</keywords>
     <repo>https://github.com/floatinghotpot/cordova-plugin-flurry.git</repo>
@@ -27,10 +27,10 @@
 	<dependency id="com.flurry.sdk-android" version=">=4.2.0"/>
         <config-file target="res/xml/config.xml" parent="/*">
             <feature name="Flurry">
-                <param name="android-package" value="com.rjfun.cordova.plugin.Flurry"/>
+                <param name="android-package" value="com.agamemnus.cordova.plugin.Flurry"/>
             </feature>
         </config-file>
-        <source-file src="src/android/Flurry.java" target-dir="src/com/rjfun/cordova/plugin" />
+        <source-file src="src/android/Flurry.java" target-dir="src/com/agamemnus/cordova/plugin" />
      </platform>
      
      <!-- ios -->
