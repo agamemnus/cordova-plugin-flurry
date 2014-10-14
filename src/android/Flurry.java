@@ -130,7 +130,7 @@ public class Flurry extends CordovaPlugin implements FlurryAdListener {
    adView.setLayoutParams(params);
   }
   
-  switch(this.adSize) {
+  switch (this.adSize) {
    case BANNER_TOP    : adSpace = adTopBanner; break;
    case BANNER_BOTTOM : adSpace = adBottomBanner; break;
    case FULLSCREEN    : adSpace = adFull; break;
