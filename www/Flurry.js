@@ -15,21 +15,22 @@ flurryExport.AD_SIZE = {BANNER: 'BANNER', SMART_BANNER: 'SMART_BANNER'}
 // success : The function to call if the banner was created successfully.
 // error   : The function to call if create banner was unsuccessful.
 flurryExport.createBannerView = function (options, success, error) {
- var defaults = {'adId': undefined, 'adSize': undefined, 'bannerAtTop': false}
- var requiredOptions = ['adId', 'adSize']
+ if (flurryExport.bannerLoaded) {
+  requestBannerAd (options, success, error)
+ } else {
+  var defaults = {'adId': undefined, 'adSize': undefined, 'bannerAtTop': false}
+  var requiredOptions = ['adId', 'adSize']
+  // Merge optional settings into defaults.
+  for (var key in defaults) {if (typeof options[key] != "undefined") defaults[key] = options[key]}
+  // Check for and merge required settings into defaults.
+  requiredOptions.forEach(function(key) {
+   if (typeof options[key] == "undefined") {error('Failed to specify key: ' + key + '.'); return}
+   defaults[key] = options[key]
+  })
+  cordova.exec (function () {requestAd (options, success, error)}, error, 'Flurry', 'createBannerView', [defaults['adId'], defaults['adSize'], defaults['bannerAtTop']])
+ }
  
- // Merge optional settings into defaults.
- for (var key in defaults) {if (typeof options[key] != "undefined") defaults[key] = options[key]}
- 
- // Check for and merge required settings into defaults.
- requiredOptions.forEach(function(key) {
-  if (typeof options[key] == "undefined") {failureCallback('Failed to specify key: ' + key + '.'); return}
-  defaults[key] = options[key]
- })
- 
- cordova.exec (function () {requestAd (options, success, error)}, error, 'Flurry', 'createBannerView', [defaults['adId'], defaults['adSize'], defaults['bannerAtTop']])
- 
- // Request an Flurry ad.  This call should not be made until after the banner view has been successfully created.
+ // Request a Flurry ad.  This call should not be made until after the banner view has been successfully created.
  // options : The options used to request an ad.  They should be specified similar to the following:
  // {'isTesting': true|false, 'extras': {'key': 'value'}}
  // isTesting is a boolean determining whether or not to request a test ad on an emulator,
@@ -37,11 +38,16 @@ flurryExport.createBannerView = function (options, success, error) {
  // the request will have testing set to false and an empty extras.
  // success : The function to call if an ad was requested successfully.
  // error   : The function to call if an ad failed to be requested.
- function requestAd (options, success, error) {
+ function requestBannerAd (options, success, error) {
   var defaults = {'isTesting': false, 'extras': {}}
   for (var key in defaults) {if (typeof options[key] != "undefined") defaults[key] = options[key]}
   cordova.exec (success, error, 'Flurry', 'requestAd', [defaults['isTesting'], defaults['extras']])
  }
+}
+
+// Destroy the banner view.
+flurryExport.destroyBannerView = function (options, success, error) {
+ cordova.exec (success, error, 'Flurry', 'destroyBannerView', [])
 }
 
 // Creates a new Flurry interstitial view.
@@ -51,45 +57,49 @@ flurryExport.createBannerView = function (options, success, error) {
 // success : The function to call if the interstitial was created successfully.
 // error   : The function to call if create interstitial was unsuccessful.
 flurryExport.createInterstitialView = function (options, success, error) {
- var defaults = {'adId': undefined}
- var requiredOptions = ['adId']
- 
- // Merge optional settings into defaults.
- for (var key in defaults) {if (typeof options[key] != "undefined") defaults[key] = options[key]}
- 
- // Check for and merge required settings into defaults.
- requiredOptions.forEach (function (key) {
-  if (typeof options[key] == "undefined") {error ('Failed to specify key: ' + key + '.'); return}
-  defaults[key] = options[key];
- })
- 
- cordova.exec (function () {requestInterstitialAd (options, success, error)}, error, 'Flurry', 'createInterstitialView', [defaults['adId']])
- 
- // Request an Flurry interstitial ad.  This call should not be made until after the interstitial view has been successfully created.
+ if (flurryExport.interstitialLoaded) {
+  requestInterstitialAd (options, success, error)
+ } else {
+  flurryExport.interstitialLoaded = true
+  var defaults = {'adId': undefined}
+  var requiredOptions = ['adId']
+  // Merge optional settings into defaults.
+  for (var key in defaults) {if (typeof options[key] != "undefined") defaults[key] = options[key]}
+  // Check for and merge required settings into defaults.
+  requiredOptions.forEach (function (key) {
+   if (typeof options[key] == "undefined") {error ('Failed to specify key: ' + key + '.'); return}
+   defaults[key] = options[key];
+  })
+  cordova.exec (function () {requestInterstitialAd (options, success, error)}, error, 'Flurry', 'createInterstitialView', [defaults['adId']])
+ }
+ // Request a Flurry interstitial ad.  This call should not be made until after the interstitial view has been successfully created.
  // options : The options used to request an ad.  They should be specified similar to the following.
  // {'isTesting': true|false, 'extras': {'key': 'value'}}
- // isTesting is a boolean determining whether or not to request a test ad on an emulator, and extras
+ // isTesting is a boolean determining whether or not to request a test ad on an emulator, and extras.
  // represents the extras to pass into the request. If no options are passed, the request will have
  // testing set to false and an empty extras.
  // success : The function to call if an ad was requested successfully.
  // error   : The function to call if an ad failed to be requested.
  function requestInterstitialAd (options, success, error) {
-  var defaults = {'isTesting': false, 'extras': {}}
+  console.dir (options)
+  flurryExport.showAd (options, success, error)
+  var defaults = {'isTesting': true, 'extras': {}}
   for (var key in defaults) {if (typeof options[key] != "undefined") defaults[key] = options[key]}
+  console.dir (defaults)
   cordova.exec (success, error, 'Flurry', 'requestInterstitialAd', [defaults['isTesting'], defaults['extras']])
  }
 }
 
-flurryExport.destroyBannerView = function (options, success, error) {
+// Destroy the interstitial view. Note: it is automatically destroyed when the user clicks the close button.
+flurryExport.destroyInterstitialView = function (options, success, error) {
  cordova.exec (success, error, 'Flurry', 'destroyBannerView', [])
 }
 
-// Show or hide Ad.
-// show    : True to show, and false to hide.  
-// success : The function to call if an ad was requested successfully.
-// error   : The function to call if an ad failed to be requested.
-flurryExport.showAd = function (show, success, error) {
- cordova.exec (success, error, 'Flurry', 'showAd', [(typeof show != "undefined") ? show : true])
+flurryExport.showAd = function (options, success, error) {
+ cordova.exec (success, error, 'Flurry', 'showAd', [])
 }
 
+flurryExport.showInterstitialAd = function (options, success, error) {
+ flurryExport.showAd (options, success, error)
+}
 module.exports = flurryExport
