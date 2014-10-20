@@ -84,7 +84,6 @@ flurryExport.createInterstitialView = function (options, success, error) {
  function requestInterstitialAd (options, success, error) {
   var defaults = {'isTesting': true, 'extras': {}}
   for (var key in defaults) {if (typeof options[key] != "undefined") defaults[key] = options[key]}
-  console.dir (defaults)
   cordova.exec (success, error, 'Flurry', 'requestInterstitialAd', [defaults['isTesting'], defaults['extras']])
  }
 }
